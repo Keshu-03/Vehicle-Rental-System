@@ -1,0 +1,197 @@
+package keshu;
+import java.util.*;
+
+// Rental Interface
+interface RentalService {
+    void rentVehicle(String customerName, int days);
+    void returnVehicle();
+}
+
+// Abstract Vehicle Class
+abstract class Vehicle implements RentalService {
+    protected String vehicleType;
+    protected String model;
+    protected double rentalPrice;
+    protected boolean isRented = false;
+    protected String rentedBy = "";
+    protected int rentedDays = 0;
+
+    public Vehicle(String vehicleType, String model, double rentalPrice) {
+        this.vehicleType = vehicleType;
+        this.model = model;
+        this.rentalPrice = rentalPrice;
+    }
+
+    public abstract void showDetails();
+
+    @Override
+    public void rentVehicle(String customerName, int days) {
+        if (!isRented) {
+            isRented = true;
+            rentedBy = customerName;
+            rentedDays = days;
+            double total = rentalPrice * days;
+            System.out.println("\n✅ " + model + " rented by " + customerName);
+            System.out.println("Days: " + days + ", Price per day: Rs. " + rentalPrice);
+            System.out.println("Total Bill: Rs. " + total);
+        } else {
+            System.out.println("❌ " + model + " is already rented.");
+        }
+    }
+
+    @Override
+    public void returnVehicle() {
+        if (isRented) {
+            System.out.println("\n🔁 " + model + " returned by " + rentedBy + ". Total days: " + rentedDays);
+            isRented = false;
+            rentedBy = "";
+            rentedDays = 0;
+        } else {
+            System.out.println("⚠️ " + model + " was not rented.");
+        }
+    }
+}
+
+// Car Class
+class Car extends Vehicle {
+    public Car(String model, double rentalPrice) {
+        super("Car", model, rentalPrice);
+    }
+
+    @Override
+    public void showDetails() {
+        System.out.println(vehicleType + " | " + model + " | Rs." + rentalPrice + "/day | Rented: " + (isRented ? "Yes by " + rentedBy : "No"));
+    }
+}
+
+// Bike Class
+class Bike extends Vehicle {
+    public Bike(String model, double rentalPrice) {
+        super("Bike", model, rentalPrice);
+    }
+
+    @Override
+    public void showDetails() {
+        System.out.println(vehicleType + " | " + model + " | Rs." + rentalPrice + "/day | Rented: " + (isRented ? "Yes by " + rentedBy : "No"));
+    }
+}
+
+// Truck Class
+class Truck extends Vehicle {
+    public Truck(String model, double rentalPrice) {
+        super("Truck", model, rentalPrice);
+    }
+
+    @Override
+    public void showDetails() {
+        System.out.println(vehicleType + " | " + model + " | Rs." + rentalPrice + "/day | Rented: " + (isRented ? "Yes by " + rentedBy : "No"));
+    }
+}
+
+// Main Program
+public class project2 {
+    static List<Vehicle> vehicles = new ArrayList<>();
+    static List<String> rentalHistory = new ArrayList<>();
+    static Map<String, String> users = new HashMap<>();
+    static String currentUser = null;
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        // Sample vehicles
+        vehicles.add(new Car("Honda City", 50.0));
+        vehicles.add(new Bike("Hero Splendor", 20.0));
+        vehicles.add(new Truck("Mahindra Pickup", 70.0));
+
+        // Sample users
+        users.put("admin", "admin123");
+        users.put("keshu", "pass");
+
+        System.out.println("===== Welcome to Vehicle Rental System =====");
+
+        while (true) {
+            if (currentUser == null) {
+                System.out.print("Enter username: ");
+                String u = sc.nextLine().trim();
+                System.out.print("Enter password: ");
+                String p = sc.nextLine().trim();
+                if (users.containsKey(u) && users.get(u).equals(p)) {
+                    currentUser = u;
+                    System.out.println("✅ Login successful! Welcome, " + u);
+                } else {
+                    System.out.println("❌ Invalid credentials. Try again.\n");
+                }
+            } else {
+                System.out.println("\n1. View Vehicles");
+                System.out.println("2. Rent Vehicle");
+                System.out.println("3. Return Vehicle");
+                System.out.println("4. View Rental History");
+                System.out.println("5. Logout");
+                System.out.println("6. Exit");
+                System.out.print("Choose option: ");
+                int opt = sc.nextInt();
+                sc.nextLine(); // consume newline
+
+                switch (opt) {
+                    case 1:
+                        System.out.println("\n-- Vehicles List --");
+                        for (int i = 0; i < vehicles.size(); i++) {
+                            System.out.print("[" + i + "] ");
+                            vehicles.get(i).showDetails();
+                        }
+                        break;
+
+                    case 2:
+                        System.out.print("Enter vehicle number to rent: ");
+                        int rentIdx = sc.nextInt();
+                        System.out.print("Enter number of days: ");
+                        int days = sc.nextInt();
+                        sc.nextLine();
+                        if (isValid(rentIdx)) {
+                            vehicles.get(rentIdx).rentVehicle(currentUser, days);
+                            rentalHistory.add(currentUser + " rented " + vehicles.get(rentIdx).model + " for " + days + " day(s)");
+                        } else {
+                            System.out.println("Invalid vehicle number.");
+                        }
+                        break;
+
+                    case 3:
+                        System.out.print("Enter vehicle number to return: ");
+                        int retIdx = sc.nextInt();
+                        sc.nextLine();
+                        if (isValid(retIdx)) {
+                            vehicles.get(retIdx).returnVehicle();
+                            rentalHistory.add(currentUser + " returned " + vehicles.get(retIdx).model);
+                        } else {
+                            System.out.println("Invalid vehicle number.");
+                        }
+                        break;
+
+                    case 4:
+                        System.out.println("\n-- Rental History --");
+                        for (String entry : rentalHistory) {
+                            System.out.println(entry);
+                        }
+                        break;
+
+                    case 5:
+                        currentUser = null;
+                        System.out.println("Logged out successfully.\n");
+                        break;
+
+                    case 6:
+                        System.out.println("Thank you for using the system! 👋");
+                        sc.close();
+                        return;
+
+                    default:
+                        System.out.println("Invalid option.");
+                }
+            }
+        }
+    }
+
+    private static boolean isValid(int index) {
+        return index >= 0 && index < vehicles.size();
+    }
+}
