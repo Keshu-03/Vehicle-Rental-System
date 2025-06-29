@@ -1,0 +1,47 @@
+package keshu;
+import java.util.Scanner;
+
+public class project1 {
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("Welcome to Vehicle Rent System!");
+        System.out.println("Choose a vehicle:");
+        System.out.println("1. Car (Rs. 1000/day)");
+        System.out.println("2. Bike (Rs. 300/day)");
+        System.out.println("3. Auto (Rs. 500/day)");
+
+        int choice = sc.nextInt();
+        System.out.print("Enter number of days: ");
+        int days = sc.nextInt();
+
+        int rentPerDay = 0;
+        String vehicleType = "";
+
+        switch (choice) {
+            case 1:
+                rentPerDay = 1000;
+                vehicleType = "Car";
+                break;
+            case 2:
+                rentPerDay = 300;
+                vehicleType = "Bike";
+                break;
+            case 3:
+                rentPerDay = 500;
+                vehicleType = "Auto";
+                break;
+            default:
+                System.out.println("Invalid choice!");
+                sc.close();
+                return;
+        }
+
+        int totalRent = rentPerDay * days;
+        System.out.println("You have chosen: " + vehicleType);
+        System.out.println("Total rent for " + days + " day(s): Rs. " + totalRent);
+
+        sc.close();
+    }
+}
